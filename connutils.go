@@ -44,7 +44,21 @@ func handleConn(conn net.Conn) {
 	}()
 
 	// simulate receiving broadcast
-	
+	go func() {
+		for {
+			time.Sleep(10 * time.Second)
+			mutex.Lock()
+			output, err := json.Marshal(Blockchain)
+			if err != nil {
+				log.Fatal(err)
+			}
+			mutex.Unlock()
+			io.WriteString(conn, string(output) + "\n\n")
+		}
+	}()
+
+	for _ = range BcServer {
+		spew.Dump(Blockchain)
 	}
 
 }
