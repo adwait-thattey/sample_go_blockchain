@@ -21,6 +21,11 @@ func CalculateHash(block Block) string {
 	return hex.EncodeToString(hashed)
 }
 
+func CheckHashValid(hash string, difficulty int) bool {
+	prefix := strings.Repeat("0", difficulty)
+	return strings.HasPrefix(hash, prefix)
+}
+
 func GenerateBlock(oldBlock Block, Balance int) (Block, error) {
 	var newBlock Block
 
@@ -32,7 +37,20 @@ func GenerateBlock(oldBlock Block, Balance int) (Block, error) {
 	newBlock.PrevHash = oldBlock.Hash
 	newBlock.Difficulty = difficulty
 
-	
+	for i := 0; ; i++ {
+		hex := fmt.Sprintf("%x", i)
+		newBlock.Nonce = hex
+		if !CheckHashValid(CalculateHash(newBlock), newBlock.Difficulty) {
+			fmt.Println(CalculateHash(newBlock), "invalid hash")
+			time.Sleep(time.Second)
+			continue
+		} else {
+			fmt.Println(CalculateHash(newBlock), " hash found")
+			newBlock.Hash = CalculateHash(newBlock)
+			break
+		}
+
+	}
 	return newBlock,nil
 }
 
